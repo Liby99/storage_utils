@@ -1,6 +1,9 @@
 #include <cstddef>
 #include <utility>
 
+#ifndef TUPLE_H
+#define TUPLE_H
+
 template <std::size_t _index, typename T>
 class _tuple_impl {
 public:
@@ -20,6 +23,8 @@ class _tuple_recurr_base<_index, L, types...>
     : public _tuple_impl<_index, L>,
       public _tuple_recurr_base<_index + 1, types...> {
 public:
+  static constexpr std::size_t SIZE = sizeof...(types) + 1;
+
   _tuple_recurr_base(L &&arg, types &&... args)
       : _tuple_impl<_index, L>(std::forward<L>(arg)),
         _tuple_recurr_base<_index + 1, types...>(std::forward<types>(args)...) {
@@ -36,16 +41,22 @@ struct extract_type_at<0, L, Args...> {
   using type = L;
 };
 
-template <typename L, typename... types>
+template <typename... types>
 class Tuple {
 public:
-  Tuple(L &&arg, types &&... args) : _tuple(std::forward<L>(arg), std::forward<types>(args)...) {}
+  Tuple(types &&... args) : _tuple(std::forward<types>(args)...) {}
 
   template <std::size_t index>
   auto &get() {
-    return (static_cast<_tuple_impl<index, typename extract_type_at<index, L, types...>::type> &>(this->_tuple)).get();
+    typedef _tuple_impl<index, typename extract_type_at<index, types...>::type> ext;
+    return (static_cast<ext &>(this->_tuple)).get();
   }
 
 private:
-  _tuple_recurr_base<0, L, types...> _tuple;
+  _tuple_recurr_base<0, types...> _tuple;
 };
+
+template <typename... CArgs>
+Tuple(CArgs... args)->Tuple<CArgs...>;
+
+#endif

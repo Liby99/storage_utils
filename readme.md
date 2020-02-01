@@ -73,6 +73,35 @@ same time. The user can, of course, specify a type parameter index to `update` o
 
 The sparse vector storage should provide these functionalities:
 
-- Be a template over
+> TODO
 
 ### Interop of Dense and Sparse vector storages
+
+> TODO
+
+## Compile & Run Test
+
+This repo follows standard CMake build process:
+
+```
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+```
+
+After that, if you want to test, you can type:
+
+```
+$ make test
+```
+
+This will run each of the executables inside the `tests` folder.
+
+## Include this library in your CMake Project
+
+Since this project is a header only library, you can simply use the following code in your `CMakeLists.txt` file:
+
+``` cmake
+add_subdirectory(PATH_TO_YOUR_STORAGE_UTILS_DIR)
+```
