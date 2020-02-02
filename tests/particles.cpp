@@ -16,9 +16,7 @@ int main() {
       particles.insert(1.0, Tuple(1.0f, 2.0f, 3.0f), Tuple(4.0f, 5.0f, 6.0f));
 
   // Assert the data inside that particle
-  auto mass = particles.get_component<0>(idx);
-  auto position = particles.get_component<1>(idx);
-  auto velocity = particles.get_component<2>(idx);
+  auto [mass, position, velocity] = particles.get(idx);
   assert(mass == 1.0);
   assert(position.get<1>() == 2.0);
   assert(velocity.get<2>() == 6.0);

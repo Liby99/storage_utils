@@ -13,6 +13,8 @@ public:
 
   std::vector<T> &get_data() { return data; }
 
+  T &get(std::size_t i) { return this->data[i]; }
+
   void set(std::size_t i, T elem) { this->data[i] = elem; }
 
   void push(T elem) { this->data.push_back(elem); }
@@ -24,9 +26,11 @@ private:
 template <std::size_t Index, typename... Types>
 class _dense_vec_storage_recurr_base {
 public:
+  std::tuple<> get_bulk(std::size_t i) { return std::make_tuple(); }
+
   void set_bulk(std::size_t i, Types... args) {}
+
   void push_bulk(Types... args) {}
-  void update_bulk(Types... args) {}
 };
 
 template <std::size_t Index, typename T, typename... Types>
@@ -39,6 +43,12 @@ public:
   _dense_vec_storage_recurr_base()
       : _dense_vec_storage_impl<Index, T>(),
         _dense_vec_storage_recurr_base<Index + 1, Types...>() {}
+
+  std::tuple<T, Types...> get_bulk(std::size_t i) {
+    std::tuple<Types...> rs = _dense_vec_storage_recurr_base<Index + 1, Types...>::get_bulk(i);
+    T hd = _dense_vec_storage_impl<Index, T>::get(i);
+    return std::tuple_cat(std::tie(hd), rs);
+  }
 
   void set_bulk(std::size_t i, T elem, Types... args) {
     _dense_vec_storage_impl<Index, T>::set(i, elem);
@@ -55,6 +65,10 @@ template <typename... Types>
 class DenseVecStorage {
 public:
   DenseVecStorage() : storage(), max_size(0) {}
+
+  std::tuple<Types...> get(std::size_t i) {
+    return this->storage.get_bulk(i);
+  }
 
   std::size_t insert(Types... args) {
     std::size_t result;
