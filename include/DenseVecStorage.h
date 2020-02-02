@@ -61,6 +61,16 @@ public:
   }
 };
 
+template <std::size_t Index, typename T, typename... Args>
+struct extract_type_at {
+  using Type = typename extract_type_at<Index - 1, Args...>::Type;
+};
+
+template <typename T, typename... Args>
+struct extract_type_at<0, T, Args...> {
+  using Type = T;
+};
+
 template <typename... Types>
 class DenseVecStorage {
 public:

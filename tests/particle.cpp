@@ -1,7 +1,7 @@
 #include "../include/Prelude.h"
 #include <assert.h>
 
-typedef Tuple<float, float, float> Vector3f;
+typedef std::tuple<float, float, float> Vector3f;
 
 void structured_binding_1() {
   Vector3f v(1.0f, 2.0f, 3.0f);
@@ -16,7 +16,7 @@ void structured_binding_1() {
   x = 100.0f;
 
   // Check if the mutation is done
-  assert(v.get<0>() == 100.0f);
+  assert(std::get<0>(v) == 100.0f);
 }
 
 void structured_binding_2() {
@@ -32,7 +32,7 @@ void structured_binding_2() {
   x = 100.0f;
 
   // `v` should not be mutated
-  assert(v.get<0>() == 1.0f);
+  assert(std::get<0>(v) == 1.0f);
 }
 
 int main() {
