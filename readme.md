@@ -1,6 +1,26 @@
 # Storage Utilities
 
-The vector storage utilities in C++.
+A header only vector storage utilities library in C++.
+
+## Usage
+
+``` c++
+typedef DenseStorageGroup<float, Vector3f, Vector3f> Particles;
+
+int main() {
+  Particles particles;
+
+  // Insert 100 points
+  for (int i = 0; i < 100; i++) {
+    particles.insert(i, Vector3f(10, 10, 10), Vector3f(10, 10, 10));
+  }
+
+  // Iterate through all particles
+  for (auto [index, mass, position, velocity] : particles) {
+    // Do things
+  }
+}
+```
 
 ## Design Goal
 
