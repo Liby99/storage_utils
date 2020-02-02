@@ -27,9 +27,11 @@ class StorageGroup {
 public:
   std::tuple<> get_bulk(std::size_t i) { return std::make_tuple(); }
 
-  void set_bulk(std::size_t i, Types... args) {}
+  template <typename... AllTypes>
+  void set_bulk(std::size_t i, const std::tuple<AllTypes...> &args) {}
 
-  void push_bulk(Types... args) {}
+  template <typename... AllTypes>
+  void push_bulk(const std::tuple<AllTypes...> &args) {}
 };
 
 template <std::size_t Index, typename T, typename... Types>
@@ -46,14 +48,16 @@ public:
     return std::tuple_cat(std::tie(hd), rs);
   }
 
-  void set_bulk(std::size_t i, T elem, Types... args) {
-    Storage<Index, T>::set(i, elem);
-    StorageGroup<Index + 1, Types...>::set_bulk(i, args...);
+  template <typename... AllTypes>
+  void set_bulk(std::size_t i, const std::tuple<AllTypes...> &args) {
+    Storage<Index, T>::set(i, std::get<Index>(args));
+    StorageGroup<Index + 1, Types...>::set_bulk(i, args);
   }
 
-  void push_bulk(T elem, Types... args) {
-    Storage<Index, T>::push(elem);
-    StorageGroup<Index + 1, Types...>::push_bulk(args...);
+  template <typename... AllTypes>
+  void push_bulk(const std::tuple<AllTypes...> &args) {
+    Storage<Index, T>::push(std::get<Index>(args));
+    StorageGroup<Index + 1, Types...>::push_bulk(args);
   }
 };
 

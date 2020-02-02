@@ -5,28 +5,38 @@
 #define DENSE_STORAGE_GROUP_H
 
 template <typename... Types>
-class DenseVecStorage {
+class DenseStorageGroup {
 public:
-  DenseVecStorage() : storage(), max_size(0) {}
+  DenseStorageGroup() : storage_group(), max_size(0) {}
 
-  std::tuple<Types...> get(std::size_t i) { return this->storage.get_bulk(i); }
+  std::tuple<Types...> get(std::size_t i) { return this->storage_group.get_bulk(i); }
 
   std::size_t insert(Types... args) {
+    auto data = std::make_tuple(args...);
+    return this->insert_bulk(data);
+  }
+
+  std::size_t insert_bulk(std::tuple<Types...> data) {
     std::size_t result;
     if (this->removed_indices.empty()) {
       result = this->max_size;
-      this->storage.push_bulk(args...);
+      this->storage_group.push_bulk(data);
       this->max_size += 1;
     } else {
       result = this->removed_indices.extract(0).value();
-      this->storage.set_bulk(result, args...);
+      this->storage_group.set_bulk(result, data);
     }
     return result;
   }
 
   bool update(std::size_t i, Types... args) {
+    auto data = std::make_tuple(args...);
+    return this->update_bulk(i, data);
+  }
+
+  bool update_bulk(std::size_t i, std::tuple<Types...> data) {
     if (this->is_valid(i)) {
-      this->storage.set_bulk(i, args...);
+      this->storage_group.set_bulk(i, data);
       return false;
     }
     return true;
@@ -63,12 +73,12 @@ public:
 private:
   std::size_t max_size;
   std::unordered_set<std::size_t> removed_indices;
-  StorageGroup<0, Types...> storage;
+  StorageGroup<0, Types...> storage_group;
 
   template <std::size_t Index>
   auto &get_component_storage() {
     typedef typename extract_type_at<Index, Types...>::Type Type;
-    return (static_cast<Storage<Index, Type> &>(this->storage)).get_data();
+    return (static_cast<Storage<Index, Type> &>(this->storage_group)).get_data();
   }
 
   bool is_valid(std::size_t i) {
