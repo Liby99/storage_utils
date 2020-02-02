@@ -17,7 +17,7 @@ int main() {
   auto idx = particles.insert(1.0, init_pos, init_vel);
 
   // Assert the data inside that particle
-  auto [mass, position, velocity] = particles.get(idx);
+  auto [mass, position, velocity] = particles.get(idx).value();
   assert(mass == 1.0);
   assert(std::get<1>(position) == 2.0);
   assert(std::get<2>(velocity) == 6.0);
@@ -30,13 +30,13 @@ int main() {
 
   // Try to update a component (mass)
   particles.update_component<0>(idx, 3.0);
-  auto the_mass_now = particles.get_component<0>(idx);
+  auto the_mass_now = particles.get_component<0>(idx).value();
   assert(the_mass_now == 3.0);
 
   // Try to update the whole particle
   auto new_pos = std::make_tuple(100.0f, 200.0f, 300.0f);
   particles.update(idx, 2.0, new_pos, init_vel);
-  auto the_mass_now_again = particles.get_component<0>(idx);
+  auto the_mass_now_again = particles.get_component<0>(idx).value();
   assert(the_mass_now_again == 2.0);
 
   // CHeck if we can remove the particle we just inserted

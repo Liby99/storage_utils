@@ -40,10 +40,12 @@ class StorageGroupBase<Index, T, Types...>
 public:
   static constexpr std::size_t SIZE = sizeof...(Types) + 1;
 
-  StorageGroupBase() : Storage<Index, T>(), StorageGroupBase<Index + 1, Types...>() {}
+  StorageGroupBase()
+      : Storage<Index, T>(), StorageGroupBase<Index + 1, Types...>() {}
 
   std::tuple<T, Types...> get_bulk(std::size_t i) {
-    std::tuple<Types...> rs = StorageGroupBase<Index + 1, Types...>::get_bulk(i);
+    std::tuple<Types...> rs =
+        StorageGroupBase<Index + 1, Types...>::get_bulk(i);
     T hd = Storage<Index, T>::get(i);
     return std::tuple_cat(std::tie(hd), rs);
   }
@@ -61,8 +63,8 @@ public:
   }
 };
 
-template <typename... Types>
-struct StorageGroup : StorageGroupBase<0, Types...> {};
+template <typename T, typename... Types>
+struct StorageGroup : StorageGroupBase<0, T, Types...> {};
 
 template <std::size_t Index, typename T, typename... Args>
 struct extract_type_at {
