@@ -28,7 +28,7 @@ int main() {
   // Check if the particle array is empty (IT IS NOT)
   assert(!particles.is_empty());
 
-  // Try to update a component
+  // Try to update a component (mass)
   particles.update_component<0>(idx, 3.0);
   auto the_mass_now = particles.get_component<0>(idx);
   assert(the_mass_now == 3.0);
