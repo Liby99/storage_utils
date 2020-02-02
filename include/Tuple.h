@@ -4,7 +4,7 @@
 #ifndef TUPLE_H
 #define TUPLE_H
 
-template <std::size_t _index, typename T>
+template <std::size_t Index, typename T>
 class _tuple_impl {
 public:
   _tuple_impl(T const &v) { val = v; }
@@ -15,48 +15,57 @@ private:
   T val;
 };
 
-template <std::size_t _index, typename... types>
+template <std::size_t Index, typename... Types>
 class _tuple_recurr_base {};
 
-template <std::size_t _index, typename L, typename... types>
-class _tuple_recurr_base<_index, L, types...>
-    : public _tuple_impl<_index, L>,
-      public _tuple_recurr_base<_index + 1, types...> {
+template <std::size_t Index, typename L, typename... Types>
+class _tuple_recurr_base<Index, L, Types...>
+    : public _tuple_impl<Index, L>,
+      public _tuple_recurr_base<Index + 1, Types...> {
 public:
-  static constexpr std::size_t SIZE = sizeof...(types) + 1;
+  static constexpr std::size_t SIZE = sizeof...(Types) + 1;
 
-  _tuple_recurr_base(L &&arg, types &&... args)
-      : _tuple_impl<_index, L>(std::forward<L>(arg)),
-        _tuple_recurr_base<_index + 1, types...>(std::forward<types>(args)...) {
-  }
+  _tuple_recurr_base(L &&arg, Types &&... args)
+      : _tuple_impl<Index, L>(std::forward<L>(arg)),
+        _tuple_recurr_base<Index + 1, Types...>(std::forward<Types>(args)...) {}
 };
 
-template <std::size_t index, typename L, typename... Args>
+template <std::size_t Index, typename L, typename... Args>
 struct extract_type_at {
-  using type = typename extract_type_at<index - 1, Args...>::type;
+  using Type = typename extract_type_at<Index - 1, Args...>::Type;
 };
 
 template <typename L, typename... Args>
 struct extract_type_at<0, L, Args...> {
-  using type = L;
+  using Type = L;
 };
 
-template <typename... types>
+template <typename... Types>
 class Tuple {
 public:
-  Tuple(types &&... args) : _tuple(std::forward<types>(args)...) {}
+  Tuple(Types &&... args) : _tuple(std::forward<Types>(args)...) {}
 
-  template <std::size_t index>
+  template <std::size_t Index>
   auto &get() {
-    typedef _tuple_impl<index, typename extract_type_at<index, types...>::type> ext;
+    typedef typename extract_type_at<Index, Types...>::Type TypeAtIndex;
+    typedef _tuple_impl<Index, TypeAtIndex> ext;
     return (static_cast<ext &>(this->_tuple)).get();
   }
 
 private:
-  _tuple_recurr_base<0, types...> _tuple;
+  _tuple_recurr_base<0, Types...> _tuple;
 };
 
-template <typename... CArgs>
-Tuple(CArgs... args)->Tuple<CArgs...>;
+template <typename... Types>
+Tuple(Types... args)->Tuple<Types...>;
+
+template<typename... Types>
+struct std::tuple_size<Tuple<Types...>>
+    : std::integral_constant<std::size_t, sizeof...(Types)> {};
+
+template<std::size_t Index, typename... Types>
+struct std::tuple_element<Index, Tuple<Types...>> {
+  using type = typename extract_type_at<Index, Types...>::Type;
+};
 
 #endif

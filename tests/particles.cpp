@@ -12,7 +12,8 @@ int main() {
   Particles particles;
 
   // Insert a particle
-  auto idx = particles.insert(1.0, Tuple(1.0f, 2.0f, 3.0f), Tuple(4.0f, 5.0f, 6.0f));
+  auto idx =
+      particles.insert(1.0, Tuple(1.0f, 2.0f, 3.0f), Tuple(4.0f, 5.0f, 6.0f));
 
   // Assert the data inside that particle
   auto mass = particles.get_component<0>(idx);
@@ -34,7 +35,8 @@ int main() {
   assert(the_mass_now == 3.0);
 
   // Try to update the whole particle
-  particles.update(idx, 2.0, Tuple(100.0f, 200.0f, 300.0f), Tuple(4.0f, 5.0f, 6.0f));
+  particles.update(idx, 2.0, Tuple(100.0f, 200.0f, 300.0f),
+                   Tuple(4.0f, 5.0f, 6.0f));
   auto the_mass_now_again = particles.get_component<0>(idx);
   assert(the_mass_now_again == 2.0);
 
