@@ -5,6 +5,51 @@
 #define DENSE_STORAGE_GROUP_H
 
 template <typename... Types>
+class DenseStorageGroupIterator {
+public:
+  DenseStorageGroupIterator(
+      const std::size_t &max_size,
+      const std::unordered_set<std::size_t> &removed_indices,
+      const StorageGroup<Types...> &storage_group)
+      : DenseStorageGroupIterator(max_size, removed_indices, storage_group, 0) {
+  }
+
+  DenseStorageGroupIterator(
+      const std::size_t &max_size,
+      const std::unordered_set<std::size_t> &removed_indices,
+      const StorageGroup<Types...> &storage_group, std::size_t index)
+      : max_size(max_size), removed_indices(removed_indices),
+        storage_group(storage_group), index(index) {}
+
+  std::tuple<std::size_t, Types...> operator*() {
+    return std::tuple_cat(std::tie(this->index),
+                          this->storage_group.get_bulk(this->index));
+  }
+
+  void operator++() {
+    this->index++;
+    auto end = this->removed_indices.end();
+    while (this->removed_indices.find(this->index) != end) {
+      this->index++;
+      if (this->index >= this->max_size) {
+        break;
+      }
+    }
+  }
+
+  bool operator!=(DenseStorageGroupIterator<Types...> other) {
+    return this->index != other.index;
+  }
+
+private:
+  std::size_t index;
+
+  const std::size_t &max_size;
+  const std::unordered_set<std::size_t> &removed_indices;
+  const StorageGroup<Types...> &storage_group;
+};
+
+template <typename... Types>
 class DenseStorageGroup {
 public:
   // The helper type `TypeAt<Index>`
@@ -174,10 +219,35 @@ public:
    */
   bool is_empty() { return this->size() == 0; }
 
+  /**
+   * Iterator begin
+   */
+  DenseStorageGroupIterator<Types...> begin() {
+    return DenseStorageGroupIterator(this->max_size, this->removed_indices,
+                                     this->storage_group, this->first_index());
+  }
+
+  /**
+   * Iterator end
+   */
+  DenseStorageGroupIterator<Types...> end() {
+    return DenseStorageGroupIterator(this->max_size, this->removed_indices,
+                                     this->storage_group, this->max_size);
+  }
+
 private:
   std::size_t max_size;
   std::unordered_set<std::size_t> removed_indices;
   StorageGroup<Types...> storage_group;
+
+  std::size_t first_index() {
+    auto end = this->removed_indices.end();
+    std::size_t i = 0;
+    while (i < this->max_size && this->removed_indices.find(i) != end) {
+      i += 1;
+    }
+    return i;
+  }
 
   bool is_valid(std::size_t i) {
     return i < this->max_size && !this->is_removed(i);

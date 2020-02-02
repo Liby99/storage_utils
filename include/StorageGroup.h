@@ -12,7 +12,7 @@ public:
 
   std::vector<T> &get_data() { return data; }
 
-  T &get(std::size_t i) { return this->data[i]; }
+  T get(std::size_t i) const { return this->data[i]; }
 
   void set(std::size_t i, T elem) { this->data[i] = elem; }
 
@@ -25,7 +25,7 @@ private:
 template <std::size_t Index, typename... Types>
 class StorageGroupBase {
 public:
-  std::tuple<> get_bulk(std::size_t i) { return std::make_tuple(); }
+  std::tuple<> get_bulk(std::size_t i) const { return std::make_tuple(); }
 
   template <typename... AllTypes>
   void set_bulk(std::size_t i, const std::tuple<AllTypes...> &args) {}
@@ -43,7 +43,7 @@ public:
   StorageGroupBase()
       : Storage<Index, T>(), StorageGroupBase<Index + 1, Types...>() {}
 
-  std::tuple<T, Types...> get_bulk(std::size_t i) {
+  std::tuple<T, Types...> get_bulk(std::size_t i) const {
     std::tuple<Types...> rs =
         StorageGroupBase<Index + 1, Types...>::get_bulk(i);
     T hd = Storage<Index, T>::get(i);
