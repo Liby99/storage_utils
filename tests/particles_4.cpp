@@ -1,6 +1,7 @@
 #include "../include/Prelude.h"
 #include <assert.h>
-#include <random>
+#include <iostream>
+#include <fstream>
 
 typedef std::tuple<float, float> Vector2f;
 
@@ -12,10 +13,7 @@ float random_0_1() {
 }
 
 Vector2f random_point_on_side() {
-  std::default_random_engine generator;
-  std::uniform_int_distribution<int> distribution(0, 4);
-  int wall = distribution(generator);
-  switch (wall) {
+  switch (int(random_0_1() * 4.0)) {
     case 0: return Vector2f(0.0, random_0_1());
     case 1: return Vector2f(random_0_1(), 0.0);
     case 2: return Vector2f(1.0, random_0_1());
@@ -53,6 +51,23 @@ void step(Particles &particles) {
   }
 }
 
+void dump(Particles &particles, const std::string &filename) {
+  std::ofstream f;
+  f.open(filename);
+  f << "[\n";
+  bool is_first = true;
+  for (auto position : particles.extract<0>()) {
+    if (is_first) {
+      is_first = false;
+    } else {
+      f << ",\n";
+    }
+    f << "{\"x\":" << std::get<0>(position) << ",\"y\":" << std::get<1>(position) << "}";
+  }
+  f << "\n]\n";
+  f.close();
+}
+
 int main() {
   Particles particles;
 
@@ -64,5 +79,6 @@ int main() {
   // Run 1000 cycles
   for (int i = 0; i < 1000; i++) {
     step(particles);
+    dump(particles, std::to_string(i) + ".json");
   }
 }

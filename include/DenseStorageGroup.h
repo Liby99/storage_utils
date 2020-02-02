@@ -63,7 +63,8 @@ public:
 
   /**
    * Get an optional Bulk of data from the storage at index `i`;
-   * If the given index `i` is invalid, then return `None`
+   * If the given index `i` is invalid, then return `None`.
+   * Note that the returned value contains mutable references to real data.
    */
   std::optional<BulkRef> get(std::size_t i) {
     if (this->is_valid(i)) {

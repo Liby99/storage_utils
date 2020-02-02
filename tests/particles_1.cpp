@@ -12,8 +12,8 @@ int main() {
   Particles particles;
 
   // Insert a particle
-  auto init_pos = std::make_tuple(1.0f, 2.0f, 3.0f);
-  auto init_vel = std::make_tuple(4.0f, 5.0f, 6.0f);
+  auto init_pos = Vector3f(1.0f, 2.0f, 3.0f);
+  auto init_vel = Vector3f(4.0f, 5.0f, 6.0f);
   auto idx = particles.insert(1.0, init_pos, init_vel);
 
   // Assert the data inside that particle
@@ -34,7 +34,7 @@ int main() {
   assert(the_mass_now == 3.0);
 
   // Try to update the whole particle
-  auto new_pos = std::make_tuple(100.0f, 200.0f, 300.0f);
+  auto new_pos = Vector3f(100.0f, 200.0f, 300.0f);
   particles.update(idx, 2.0, new_pos, init_vel);
   auto the_mass_now_again = particles.get_component<0>(idx).value();
   assert(the_mass_now_again == 2.0);
