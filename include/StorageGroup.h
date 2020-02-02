@@ -23,7 +23,7 @@ private:
 };
 
 template <std::size_t Index, typename... Types>
-class StorageGroup {
+class StorageGroupBase {
 public:
   std::tuple<> get_bulk(std::size_t i) { return std::make_tuple(); }
 
@@ -35,15 +35,15 @@ public:
 };
 
 template <std::size_t Index, typename T, typename... Types>
-class StorageGroup<Index, T, Types...>
-    : public Storage<Index, T>, public StorageGroup<Index + 1, Types...> {
+class StorageGroupBase<Index, T, Types...>
+    : public Storage<Index, T>, public StorageGroupBase<Index + 1, Types...> {
 public:
   static constexpr std::size_t SIZE = sizeof...(Types) + 1;
 
-  StorageGroup() : Storage<Index, T>(), StorageGroup<Index + 1, Types...>() {}
+  StorageGroupBase() : Storage<Index, T>(), StorageGroupBase<Index + 1, Types...>() {}
 
   std::tuple<T, Types...> get_bulk(std::size_t i) {
-    std::tuple<Types...> rs = StorageGroup<Index + 1, Types...>::get_bulk(i);
+    std::tuple<Types...> rs = StorageGroupBase<Index + 1, Types...>::get_bulk(i);
     T hd = Storage<Index, T>::get(i);
     return std::tuple_cat(std::tie(hd), rs);
   }
@@ -51,15 +51,18 @@ public:
   template <typename... AllTypes>
   void set_bulk(std::size_t i, const std::tuple<AllTypes...> &args) {
     Storage<Index, T>::set(i, std::get<Index>(args));
-    StorageGroup<Index + 1, Types...>::set_bulk(i, args);
+    StorageGroupBase<Index + 1, Types...>::set_bulk(i, args);
   }
 
   template <typename... AllTypes>
   void push_bulk(const std::tuple<AllTypes...> &args) {
     Storage<Index, T>::push(std::get<Index>(args));
-    StorageGroup<Index + 1, Types...>::push_bulk(args);
+    StorageGroupBase<Index + 1, Types...>::push_bulk(args);
   }
 };
+
+template <typename... Types>
+struct StorageGroup : StorageGroupBase<0, Types...> {};
 
 template <std::size_t Index, typename T, typename... Args>
 struct extract_type_at {

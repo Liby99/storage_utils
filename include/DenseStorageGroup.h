@@ -73,7 +73,7 @@ public:
 private:
   std::size_t max_size;
   std::unordered_set<std::size_t> removed_indices;
-  StorageGroup<0, Types...> storage_group;
+  StorageGroup<Types...> storage_group;
 
   template <std::size_t Index>
   auto &get_component_storage() {
