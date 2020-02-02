@@ -10,18 +10,12 @@ public:
   DenseStorageGroupIterator(
       const std::size_t &max_size,
       const std::unordered_set<std::size_t> &removed_indices,
-      const StorageGroup<Types...> &storage_group)
-      : DenseStorageGroupIterator(max_size, removed_indices, storage_group, 0) {
-  }
-
-  DenseStorageGroupIterator(
-      const std::size_t &max_size,
-      const std::unordered_set<std::size_t> &removed_indices,
-      const StorageGroup<Types...> &storage_group, std::size_t index)
+      StorageGroup<Types...> &storage_group,
+      std::size_t index)
       : max_size(max_size), removed_indices(removed_indices),
         storage_group(storage_group), index(index) {}
 
-  std::tuple<std::size_t, Types...> operator*() {
+  std::tuple<std::size_t, Types &...> operator*() {
     return std::tuple_cat(std::tie(this->index),
                           this->storage_group.get_bulk(this->index));
   }
@@ -46,7 +40,7 @@ private:
 
   const std::size_t &max_size;
   const std::unordered_set<std::size_t> &removed_indices;
-  const StorageGroup<Types...> &storage_group;
+  StorageGroup<Types...> &storage_group;
 };
 
 template <typename... Types>
@@ -59,6 +53,9 @@ public:
   // The helper type `Bulk` for the tuple of all types
   using Bulk = std::tuple<Types...>;
 
+  // The helper type `BulkRef` for the tuple containing reference to all types
+  using BulkRef = std::tuple<Types &...>;
+
   /**
    * Default constructor
    */
@@ -68,7 +65,7 @@ public:
    * Get an optional Bulk of data from the storage at index `i`;
    * If the given index `i` is invalid, then return `None`
    */
-  std::optional<Bulk> get(std::size_t i) {
+  std::optional<BulkRef> get(std::size_t i) {
     if (this->is_valid(i)) {
       return this->storage_group.get_bulk(i);
     } else {
@@ -101,6 +98,25 @@ public:
       this->removed_indices.erase(first_index_it);
       this->storage_group.set_bulk(index, data);
     }
+    return index;
+  }
+
+  /**
+   * Force append the data as function arguments to the end of the storage.
+   * Return the inserted index.
+   */
+  std::size_t append(Types... args) {
+    auto data = std::make_tuple(args...);
+    return this->append_bulk(data);
+  }
+
+  /**
+   * Force append the data as bulk to the end of the storage. Return the
+   * inserted index.
+   */
+  std::size_t append_bulk(Bulk data) {
+    std::size_t index = this->max_size++;
+    this->storage_group.push_bulk(data);
     return index;
   }
 

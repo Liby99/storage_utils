@@ -10,14 +10,14 @@ typedef DenseStorageGroup<float, Vector3f, Vector3f> Particles;
 int main() {
   Particles particles;
 
-  // Insert 100 points
+  // Insert 100 particles
   for (int i = 0; i < 100; i++) {
-    particles.insert(i, Vector3f(10, 10, 10), Vector3f(10, 10, 10));
+    particles.insert(3.0, Vector3f(1.0, 1.0, 1.0), Vector3f(0.0, 0.0, 0.0));
   }
 
   // Iterate through all particles
   for (auto [index, mass, position, velocity] : particles) {
-    // Do things
+    // Do things to each particle's mass, position, and velocity
   }
 }
 ```
