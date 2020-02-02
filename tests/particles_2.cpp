@@ -29,7 +29,7 @@ int main() {
   // Now the size should be 100, and `max_size` still 100, meaning that
   // all the gaps are filled without introducing new indices
   assert(particles.size() == 100);
-  assert(particles._max_size() == 100);
+  assert(particles._max_size() == 100); // this _max_size function is used for debug
 
   // Extract the mass storage, the extracted storage should also contain 100 elements
   std::vector<float> mass_storage = particles.extract<0>();
