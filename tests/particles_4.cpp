@@ -6,7 +6,7 @@
 typedef std::tuple<float, float> Vector2f;
 
 // Position, Velocity
-typedef DenseStorageGroup<Vector2f, Vector2f> Particles;
+using Particles = DenseStorageGroup<Vector2f, Vector2f>;
 
 float random_0_1() {
   return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
