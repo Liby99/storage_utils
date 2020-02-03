@@ -1,7 +1,7 @@
 #include "storage_utils/Prelude.h"
 #include <assert.h>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 typedef std::tuple<float, float> Vector2f;
 
@@ -14,10 +14,14 @@ float random_0_1() {
 
 Vector2f random_point_on_side() {
   switch (int(random_0_1() * 4.0)) {
-    case 0: return Vector2f(0.0, random_0_1());
-    case 1: return Vector2f(random_0_1(), 0.0);
-    case 2: return Vector2f(1.0, random_0_1());
-    default: return Vector2f(random_0_1(), 1.0);
+  case 0:
+    return Vector2f(0.0, random_0_1());
+  case 1:
+    return Vector2f(random_0_1(), 0.0);
+  case 2:
+    return Vector2f(1.0, random_0_1());
+  default:
+    return Vector2f(random_0_1(), 1.0);
   }
 }
 
@@ -62,7 +66,8 @@ void dump(Particles &particles, const std::string &filename) {
     } else {
       f << ",\n";
     }
-    f << "{\"x\":" << std::get<0>(position) << ",\"y\":" << std::get<1>(position) << "}";
+    f << "{\"x\":" << std::get<0>(position)
+      << ",\"y\":" << std::get<1>(position) << "}";
   }
   f << "\n]\n";
   f.close();

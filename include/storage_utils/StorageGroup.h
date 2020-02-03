@@ -1,7 +1,7 @@
+#include <algorithm>
 #include <cstddef>
 #include <utility>
 #include <vector>
-#include <algorithm>
 
 #ifndef STORAGE_GROUP_H
 #define STORAGE_GROUP_H

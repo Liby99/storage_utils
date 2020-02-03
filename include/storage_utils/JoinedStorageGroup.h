@@ -27,14 +27,13 @@ public:
 
   bool contains(Entity i) {
     return JoinedStorage<Index, DS>::storage.contains(i) &&
-      JoinedStorageGroupBase<Index + 1, DenseStorages...>::contains(i);
+           JoinedStorageGroupBase<Index + 1, DenseStorages...>::contains(i);
   }
 
   auto get_unchecked(Entity i) {
     return std::tuple_cat(
-      JoinedStorage<Index, DS>::storage.get_unchecked(i),
-      JoinedStorageGroupBase<Index + 1, DenseStorages...>::get_unchecked(i)
-    );
+        JoinedStorage<Index, DS>::storage.get_unchecked(i),
+        JoinedStorageGroupBase<Index + 1, DenseStorages...>::get_unchecked(i));
   }
 };
 
@@ -51,16 +50,11 @@ public:
   }
 
   auto get_unchecked(Entity i) {
-    return std::tuple_cat(
-      std::tie(i),
-      this->vs.get_unchecked(i),
-      this->dss.get_unchecked(i)
-    );
+    return std::tuple_cat(std::tie(i), this->vs.get_unchecked(i),
+                          this->dss.get_unchecked(i));
   }
 
-  std::size_t size() {
-    return this->vs.size();
-  }
+  std::size_t size() { return this->vs.size(); }
 
   JoinedStorageGroupIterator<VS, DSS...> begin();
 
@@ -81,11 +75,10 @@ public:
     }
   }
 
-  JoinedStorageGroupIterator(JoinedStorageGroup<VS, DSS...> &s, bool is_end) : s(s), index(s.size()) {}
+  JoinedStorageGroupIterator(JoinedStorageGroup<VS, DSS...> &s, bool is_end)
+      : s(s), index(s.size()) {}
 
-  auto operator*() {
-    return this->s.get_unchecked(this->index);
-  }
+  auto operator*() { return this->s.get_unchecked(this->index); }
 
   void operator++() {
     this->index++;

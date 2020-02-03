@@ -8,22 +8,19 @@
 template <typename... Types>
 class DenseStorageGroupIterator {
 public:
-  DenseStorageGroupIterator(
-    const std::size_t &storage_size,
-    const std::vector<Entity> &global_index_map,
-    StorageGroup<Types...> &storage_group,
-    std::size_t index)
-    : storage_size(storage_size), global_index_map(global_index_map),
-      storage_group(storage_group), index(index) {}
+  DenseStorageGroupIterator(const std::size_t &storage_size,
+                            const std::vector<Entity> &global_index_map,
+                            StorageGroup<Types...> &storage_group,
+                            std::size_t index)
+      : storage_size(storage_size), global_index_map(global_index_map),
+        storage_group(storage_group), index(index) {}
 
   std::tuple<Entity, Types &...> operator*() {
     return std::tuple_cat(std::tie(this->global_index_map[this->index]),
                           this->storage_group.get_bulk(this->index));
   }
 
-  void operator++() {
-    this->index++;
-  }
+  void operator++() { this->index++; }
 
   bool operator!=(DenseStorageGroupIterator<Types...> other) {
     return this->index != other.index;
@@ -121,7 +118,8 @@ public:
         Entity last_index = --this->storage_size;
 
         // Copy the data_index and invalidate the `i`th index
-        this->data_index_map[this->global_index_map[last_index]] = data_index.value();
+        this->data_index_map[this->global_index_map[last_index]] =
+            data_index.value();
         this->data_index_map[i] = {};
 
         // Swap the element on data_size & last_index;
@@ -195,11 +193,13 @@ public:
   bool is_empty() { return this->size() == 0; }
 
   DenseStorageGroupIterator<Types...> begin() {
-    return DenseStorageGroupIterator(this->storage_size, this->global_index_map, this->storage_group, 0);
+    return DenseStorageGroupIterator(this->storage_size, this->global_index_map,
+                                     this->storage_group, 0);
   }
 
   DenseStorageGroupIterator<Types...> end() {
-    return DenseStorageGroupIterator(this->storage_size, this->global_index_map, this->storage_group, this->storage_size);
+    return DenseStorageGroupIterator(this->storage_size, this->global_index_map,
+                                     this->storage_group, this->storage_size);
   }
 
 private:

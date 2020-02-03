@@ -1,5 +1,5 @@
-#include "StorageGroup.h"
 #include "JoinedStorageGroup.h"
+#include "StorageGroup.h"
 #include <unordered_set>
 
 #ifndef VEC_STORAGE_GROUP_H
@@ -289,9 +289,7 @@ private:
   std::unordered_set<Entity> removed_indices;
   StorageGroup<Types...> storage_group;
 
-  bool is_valid(Entity i) {
-    return i < this->max_size && !this->is_removed(i);
-  }
+  bool is_valid(Entity i) { return i < this->max_size && !this->is_removed(i); }
 
   bool is_removed(Entity i) {
     auto it = this->removed_indices.find(i);

@@ -23,8 +23,12 @@ int main() {
 
   for (int i = 0; i < 100; i++) {
     auto id = particles.insert(1.0, Vector2f(1.0, 1.0), Vector2f(1.0, 1.0));
-    if (i < 25) { hardenings.insert(id, 1.0); }
-    if (i < 50) { deformations.insert(id, 0.0, 1.0, Matrix2f(1.0, 0.0, 0.0, 1.0)); }
+    if (i < 25) {
+      hardenings.insert(id, 1.0);
+    }
+    if (i < 50) {
+      deformations.insert(id, 0.0, 1.0, Matrix2f(1.0, 0.0, 0.0, 1.0));
+    }
   }
 
   JoinedParDefHar joined_1(particles, deformations, hardenings);

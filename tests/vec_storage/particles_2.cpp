@@ -13,7 +13,8 @@ int main() {
 
   // Insert 100 consecutive
   for (int i = 0; i < 100; i++) {
-    particles.insert(i, std::make_tuple(i, i, i), std::make_tuple(0.0, 0.0, 0.0));
+    particles.insert(i, std::make_tuple(i, i, i),
+                     std::make_tuple(0.0, 0.0, 0.0));
   }
 
   // Remove every first of two. Only 50 particles left now, scattered apart
@@ -21,17 +22,21 @@ int main() {
     particles.remove(i);
   }
 
-  // Add back 50 particles, these particles should fill the gap of previous removal
+  // Add back 50 particles, these particles should fill the gap of previous
+  // removal
   for (int i = 0; i < 50; i++) {
-    particles.insert(i + 100, std::make_tuple(i, i, i), std::make_tuple(0.0, 0.0, 0.0));
+    particles.insert(i + 100, std::make_tuple(i, i, i),
+                     std::make_tuple(0.0, 0.0, 0.0));
   }
 
   // Now the size should be 100, and `max_size` still 100, meaning that
   // all the gaps are filled without introducing new indices
   assert(particles.size() == 100);
-  assert(particles._max_size() == 100); // this _max_size function is used for debug
+  assert(particles._max_size() ==
+         100); // this _max_size function is used for debug
 
-  // Extract the mass storage, the extracted storage should also contain 100 elements
+  // Extract the mass storage, the extracted storage should also contain 100
+  // elements
   std::vector<float> mass_storage = particles.extract<0>();
   assert(mass_storage.size() == 100);
 
@@ -40,7 +45,8 @@ int main() {
     particles.remove(i);
   }
 
-  // Extract the mass storage again, the extracted storage should only contain 75 elements
+  // Extract the mass storage again, the extracted storage should only contain
+  // 75 elements
   std::vector<float> mass_storage_2 = particles.extract<0>();
   assert(mass_storage_2.size() == 75);
 }
