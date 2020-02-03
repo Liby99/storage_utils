@@ -1,10 +1,9 @@
-# Storage Utilities
+#include <storage_utils/Prelude.h>
 
-A header only vector storage utilities library in C++.
+using Vector2f = std::tuple<float, float>;
 
-## Usage
+using Matrix2f = std::tuple<float, float, float, float>;
 
-``` c++
 // mass, position, velocity
 using Particles = VecStorageGroup<float, Vector2f, Vector2f>;
 
@@ -37,38 +36,3 @@ int main() {
     // Do things with particle & deformation & hardenings
   }
 }
-```
-
-## Compile & Run Test
-
-This repo follows standard CMake build process:
-
-```
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
-```
-
-After that, if you want to test, you can type:
-
-```
-$ make test
-```
-
-This will run each of the executables inside the `tests` folder.
-
-## Include this library in your CMake Project
-
-Since this project is a header only library, you can simply use the following code in your `CMakeLists.txt` file:
-
-``` cmake
-add_subdirectory(${PATH_TO_YOUR_STORAGE_UTILS_DIR})
-target_include_directories(${YOUR_TARGET} PUBLIC ${PATH_TO_YOUR_STORAGE_UTILS_DIR}/include/)
-```
-
-And then you can use, in your `C++` code,
-
-```
-#include <storage_utils/Prelude.h>
-```

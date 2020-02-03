@@ -1,11 +1,9 @@
 #include "StorageGroup.h"
+#include "JoinedStorageGroup.h"
 #include <unordered_set>
 
 #ifndef VEC_STORAGE_GROUP_H
 #define VEC_STORAGE_GROUP_H
-
-// template <class VS, class... DSS>
-// class JoinedStorageGroup;
 
 template <typename... Types>
 class VecStorageGroupIterator {
@@ -280,8 +278,10 @@ public:
                                    this->storage_group, this->max_size);
   }
 
-  // template <class... DSS>
-  // JoinedStorageGroup<VecStorageGroup<Types...>, DSS...> join(DSS &... dss);
+  template <class... DSS>
+  JoinedStorageGroup<VecStorageGroup<Types...>, DSS...> join(DSS &... dss) {
+    return JoinedStorageGroup(*this, dss...);
+  }
 
 private:
   Entity first_index;

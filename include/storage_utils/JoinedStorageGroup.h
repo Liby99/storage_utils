@@ -1,6 +1,3 @@
-#include "DenseStorageGroup.h"
-#include "VecStorageGroup.h"
-
 #ifndef JOINED_STORAGE_GROUP_H
 #define JOINED_STORAGE_GROUP_H
 
@@ -115,10 +112,5 @@ template <class VS, class... DSS>
 JoinedStorageGroupIterator<VS, DSS...> JoinedStorageGroup<VS, DSS...>::end() {
   return JoinedStorageGroupIterator(*this, true);
 }
-
-// template <typename... Types, class... DSS>
-// JoinedStorageGroup<VecStorageGroup<Types...>, DSS...> VecStorageGroup::join(DSS &... dss) {
-//   return JoinedStorageGroup(*this, dss...);
-// }
 
 #endif
