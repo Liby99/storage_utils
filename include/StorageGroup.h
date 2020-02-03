@@ -5,6 +5,8 @@
 #ifndef STORAGE_GROUP_H
 #define STORAGE_GROUP_H
 
+using Entity = std::size_t;
+
 template <std::size_t Index, typename T>
 class Storage {
 public:
@@ -12,9 +14,9 @@ public:
 
   std::vector<T> &get_data() { return data; }
 
-  T &get(std::size_t i) { return this->data[i]; }
+  T &get(Entity i) { return this->data[i]; }
 
-  void set(std::size_t i, T elem) { this->data[i] = elem; }
+  void set(Entity i, T elem) { this->data[i] = elem; }
 
   void push(T elem) { this->data.push_back(elem); }
 
@@ -25,10 +27,10 @@ private:
 template <std::size_t Index, typename... Types>
 class StorageGroupBase {
 public:
-  std::tuple<> get_bulk(std::size_t i) { return std::make_tuple(); }
+  std::tuple<> get_bulk(Entity i) { return std::make_tuple(); }
 
   template <typename... AllTypes>
-  void set_bulk(std::size_t i, const std::tuple<AllTypes...> &args) {}
+  void set_bulk(Entity i, const std::tuple<AllTypes...> &args) {}
 
   template <typename... AllTypes>
   void push_bulk(const std::tuple<AllTypes...> &args) {}
@@ -43,7 +45,7 @@ public:
   StorageGroupBase()
       : Storage<Index, T>(), StorageGroupBase<Index + 1, Types...>() {}
 
-  std::tuple<T &, Types &...> get_bulk(std::size_t i) {
+  std::tuple<T &, Types &...> get_bulk(Entity i) {
     std::tuple<Types &...> rs =
         StorageGroupBase<Index + 1, Types...>::get_bulk(i);
     T &hd = Storage<Index, T>::get(i);
@@ -51,7 +53,7 @@ public:
   }
 
   template <typename... AllTypes>
-  void set_bulk(std::size_t i, const std::tuple<AllTypes...> &args) {
+  void set_bulk(Entity i, const std::tuple<AllTypes...> &args) {
     Storage<Index, T>::set(i, std::get<Index>(args));
     StorageGroupBase<Index + 1, Types...>::set_bulk(i, args);
   }

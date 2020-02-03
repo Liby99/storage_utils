@@ -6,7 +6,7 @@
 typedef std::tuple<float, float> Vector2f;
 
 // Position, Velocity
-using Particles = DenseStorageGroup<Vector2f, Vector2f>;
+using Particles = VecStorageGroup<Vector2f, Vector2f>;
 
 float random_0_1() {
   return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
@@ -79,6 +79,6 @@ int main() {
   // Run 1000 cycles
   for (int i = 0; i < 1000; i++) {
     step(particles);
-    dump(particles, std::to_string(i) + ".json");
+    // dump(particles, std::to_string(i) + ".json");
   }
 }

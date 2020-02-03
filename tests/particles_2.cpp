@@ -6,7 +6,7 @@ typedef std::tuple<float, float, float> Vector3f;
 typedef std::tuple<float, Vector3f, Vector3f> Particle;
 
 // Mass, Position, Velocity
-typedef DenseStorageGroup<float, Vector3f, Vector3f> Particles;
+typedef VecStorageGroup<float, Vector3f, Vector3f> Particles;
 
 int main() {
   Particles particles;
