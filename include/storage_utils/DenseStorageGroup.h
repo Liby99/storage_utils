@@ -182,6 +182,14 @@ public:
     printf("]\n");
   }
 
+  bool contains(Entity i) {
+    if (i < this->data_index_map.size()) {
+      auto data_index = this->data_index_map[i];
+      return data_index.has_value();
+    }
+    return false;
+  }
+
   std::size_t size() { return this->storage_size; }
 
   bool is_empty() { return this->size() == 0; }

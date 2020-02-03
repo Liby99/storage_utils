@@ -244,6 +244,8 @@ public:
     return result;
   }
 
+  bool contains(Entity i) { return this->is_valid(i); }
+
   /**
    * Get the size of this storage. Only valid elements will be considered.
    */
@@ -281,11 +283,11 @@ private:
   std::unordered_set<Entity> removed_indices;
   StorageGroup<Types...> storage_group;
 
-  bool is_valid(std::size_t i) {
+  bool is_valid(Entity i) {
     return i < this->max_size && !this->is_removed(i);
   }
 
-  bool is_removed(std::size_t i) {
+  bool is_removed(Entity i) {
     auto it = this->removed_indices.find(i);
     return it != this->removed_indices.end();
   }
