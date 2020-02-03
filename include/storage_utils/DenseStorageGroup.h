@@ -1,5 +1,6 @@
 #include "StorageGroup.h"
 #include <unordered_set>
+#include <algorithm>
 
 #ifndef DENSE_STORAGE_GROUP_H
 #define DENSE_STORAGE_GROUP_H
@@ -20,13 +21,13 @@ public:
   /**
    * Default constructor
    */
-  DenseStorageGroup() : storage_size(0) {}
+  DenseStorageGroup() : storage_size(0), data_index_map_size(0) {}
 
   std::optional<BulkRef> get(Entity i) {
     if (i < this->storage_size) {
       auto data_index = this->data_index_map[i];
-      if (data_index) {
-        return this->storage_group.get_bulk(data_index);
+      if (data_index.has_value()) {
+        return this->storage_group.get_bulk(data_index.value());
       } else {
         return {};
       }
@@ -37,22 +38,22 @@ public:
 
   BulkRef get_unchecked(Entity i) {
     auto data_index = this->data_index_map[i];
-    return this->storage_group.get_bulk(data_index);
+    return this->storage_group.get_bulk(data_index.value());
   }
 
   void insert(Entity i, Types... args) {
     auto data = std::make_tuple(args...);
-    return this->insert_bulk(data);
+    return this->insert_bulk(i, data);
   }
 
   void insert_bulk(Entity i, Bulk data) {
-    if (i < this->data_index_map.size()) {
+    if (i < this->data_index_map_size) {
       auto data_id = this->data_index_map[i];
-      if (data_id) {
+      if (data_id.has_value()) {
 
         // If data id is presented, that means we are just updating the
         // data of entity `i`
-        this->storage_group.set_bulk(data_id, data);
+        this->storage_group.set_bulk(data_id.value(), data);
 
         // No need to do anything else in this case
         return;
@@ -60,7 +61,9 @@ public:
     } else {
 
       // Make sure data_index_map can contain more than `i + 1` elements
-      this->data_index_map.reserve(i + 1);
+      auto size = i + 1;
+      this->data_index_map.resize(size, {});
+      this->data_index_map_size = size;
     }
 
     // Append to the storage
@@ -76,16 +79,19 @@ public:
   }
 
   bool remove(Entity i) {
-    if (i < this->data_index_map) {
+    if (i < this->data_index_map_size) {
       auto data_index = this->data_index_map[i];
-      if (data_index) {
+      if (data_index.has_value()) {
         Entity last_index = --this->storage_size;
 
         // Swap the element on data_size & last_index;
-        swap(this->global_index_map[data_index], this->global_index_map[last_index]);
+        std::swap(this->global_index_map[data_index.value()], this->global_index_map[last_index]);
 
         // Swap the components in the storage
-        this->storage_group.swap(data_index, last_index);
+        this->storage_group.swap(data_index.value(), last_index);
+
+        // Removal success
+        return true;
       }
     }
     return false;
@@ -119,8 +125,21 @@ public:
 
   bool is_empty() { return this->size() == 0; }
 
+  // void print_data_index_map() {
+  //   printf("DataIndexMap: [");
+  //   for (int i = 0; i < this->data_index_map_size; i++) {
+  //     if (this->data_index_map[i].has_value()) {
+  //       printf("%lu, ", this->data_index_map[i].value());
+  //     } else {
+  //       printf("None, ");
+  //     }
+  //   }
+  //   printf("]\n");
+  // }
+
 private:
   std::size_t storage_size;
+  std::size_t data_index_map_size;
 
   // From global index to local index. The local index is optional since the data
   // might not be contained in this storage. This map should have the same size

@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 #ifndef STORAGE_GROUP_H
 #define STORAGE_GROUP_H
@@ -20,7 +21,7 @@ public:
 
   void push(T elem) { this->data.push_back(elem); }
 
-  void swap(Entity i, Entity j) { swap(this->data[i], this->data[j]); }
+  void swap(Entity i, Entity j) { std::swap(this->data[i], this->data[j]); }
 
 private:
   std::vector<T> data;
