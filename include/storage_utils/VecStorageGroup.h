@@ -4,6 +4,9 @@
 #ifndef VEC_STORAGE_GROUP_H
 #define VEC_STORAGE_GROUP_H
 
+// template <class VS, class... DSS>
+// class JoinedStorageGroup;
+
 template <typename... Types>
 class VecStorageGroupIterator {
 public:
@@ -276,6 +279,9 @@ public:
     return VecStorageGroupIterator(this->max_size, this->removed_indices,
                                    this->storage_group, this->max_size);
   }
+
+  // template <class... DSS>
+  // JoinedStorageGroup<VecStorageGroup<Types...>, DSS...> join(DSS &... dss);
 
 private:
   Entity first_index;

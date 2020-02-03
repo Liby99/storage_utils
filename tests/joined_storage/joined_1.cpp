@@ -37,6 +37,12 @@ int main() {
     }
   }
 
+  int counter_1 = 0;
+  for (auto [index, mass, pos, vel, t_c, t_s, f, h] : joined_1) {
+    counter_1 += 1;
+  }
+  assert(counter_1 == 25);
+
   JoinedParDef joined_2(particles, deformations);
 
   for (int i = 0; i < 100; i++) {
@@ -46,4 +52,10 @@ int main() {
       assert(!joined_2.contains(i));
     }
   }
+
+  int counter_2 = 0;
+  for (auto p : joined_2) {
+    counter_2 += 1;
+  }
+  assert(counter_2 == 50);
 }
