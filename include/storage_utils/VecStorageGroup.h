@@ -276,8 +276,8 @@ public:
   }
 
 private:
-  std::size_t max_size;
   Entity first_index;
+  std::size_t max_size;
   std::unordered_set<Entity> removed_indices;
   StorageGroup<Types...> storage_group;
 
