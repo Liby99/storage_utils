@@ -13,8 +13,6 @@ class Storage {
 public:
   Storage() {}
 
-  std::vector<T> &get_data() { return data; }
-
   T &get(Entity i) { return this->data[i]; }
 
   void set(Entity i, T elem) { this->data[i] = elem; }
