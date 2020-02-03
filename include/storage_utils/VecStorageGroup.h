@@ -10,8 +10,7 @@ public:
   VecStorageGroupIterator(
       const std::size_t &max_size,
       const std::unordered_set<std::size_t> &removed_indices,
-      StorageGroup<Types...> &storage_group,
-      std::size_t index)
+      StorageGroup<Types...> &storage_group, std::size_t index)
       : max_size(max_size), removed_indices(removed_indices),
         storage_group(storage_group), index(index) {}
 
@@ -74,9 +73,7 @@ public:
     }
   }
 
-  BulkRef get_unchecked(Entity i) {
-    return this->storage_group.get_bulk(i);
-  }
+  BulkRef get_unchecked(Entity i) { return this->storage_group.get_bulk(i); }
 
   /**
    * Insert all the data (as function arguments) to the storage group.
@@ -267,7 +264,7 @@ public:
    */
   VecStorageGroupIterator<Types...> begin() {
     return VecStorageGroupIterator(this->max_size, this->removed_indices,
-                                     this->storage_group, this->first_index);
+                                   this->storage_group, this->first_index);
   }
 
   /**
@@ -275,7 +272,7 @@ public:
    */
   VecStorageGroupIterator<Types...> end() {
     return VecStorageGroupIterator(this->max_size, this->removed_indices,
-                                     this->storage_group, this->max_size);
+                                   this->storage_group, this->max_size);
   }
 
 private:

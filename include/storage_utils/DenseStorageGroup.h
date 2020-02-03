@@ -1,6 +1,6 @@
 #include "StorageGroup.h"
-#include <unordered_set>
 #include <algorithm>
+#include <unordered_set>
 
 #ifndef DENSE_STORAGE_GROUP_H
 #define DENSE_STORAGE_GROUP_H
@@ -21,19 +21,16 @@ public:
   /**
    * Default constructor
    */
-  DenseStorageGroup() : storage_size(0), data_index_map_size(0) {}
+  DenseStorageGroup() : storage_size(0) {}
 
   std::optional<BulkRef> get(Entity i) {
-    if (i < this->storage_size) {
+    if (i < this->data_index_map.size()) {
       auto data_index = this->data_index_map[i];
       if (data_index.has_value()) {
         return this->storage_group.get_bulk(data_index.value());
-      } else {
-        return {};
       }
-    } else {
-      return {};
     }
+    return {};
   }
 
   BulkRef get_unchecked(Entity i) {
@@ -47,23 +44,14 @@ public:
   }
 
   void insert_bulk(Entity i, Bulk data) {
-    if (i < this->data_index_map_size) {
-      auto data_id = this->data_index_map[i];
-      if (data_id.has_value()) {
-
-        // If data id is presented, that means we are just updating the
-        // data of entity `i`
-        this->storage_group.set_bulk(data_id.value(), data);
-
-        // No need to do anything else in this case
+    if (i < this->data_index_map.size()) {
+      auto data_index = this->data_index_map[i];
+      if (data_index.has_value()) {
+        this->storage_group.set_bulk(data_index.value(), data);
         return;
       } // Otherwise, append to the storage.
     } else {
-
-      // Make sure data_index_map can contain more than `i + 1` elements
-      auto size = i + 1;
-      this->data_index_map.resize(size, {});
-      this->data_index_map_size = size;
+      this->data_index_map.resize(i + 1, {});
     }
 
     // Append to the storage
@@ -78,14 +66,35 @@ public:
     }
   }
 
+  bool update(Entity i, Types... args) {
+    auto data = std::make_tuple(args...);
+    return this->update_bulk(i, data);
+  }
+
+  bool update_bulk(Entity i, Bulk data) {
+    if (i < this->data_index_map.size()) {
+      auto data_index = this->data_index_map[i];
+      if (data_index.has_value()) {
+        this->storage_group.set_bulk(data_index.value(), data);
+        return true;
+      }
+    }
+    return false;
+  }
+
   bool remove(Entity i) {
-    if (i < this->data_index_map_size) {
+    if (i < this->data_index_map.size()) {
       auto data_index = this->data_index_map[i];
       if (data_index.has_value()) {
         Entity last_index = --this->storage_size;
 
+        // Copy the data_index and invalidate the `i`th index
+        this->data_index_map[this->global_index_map[last_index]] = data_index.value();
+        this->data_index_map[i] = {};
+
         // Swap the element on data_size & last_index;
-        std::swap(this->global_index_map[data_index.value()], this->global_index_map[last_index]);
+        std::swap(this->global_index_map[data_index.value()],
+                  this->global_index_map[last_index]);
 
         // Swap the components in the storage
         this->storage_group.swap(data_index.value(), last_index);
@@ -100,54 +109,61 @@ public:
   template <std::size_t Index>
   std::optional<TypeAt<Index>> get_component(Entity i) {
     using S = Storage<Index, TypeAt<Index>>;
-    if (i < this->storage_size) {
+    if (i < this->data_index_map.size()) {
       auto data_index = this->data_index_map[i];
-      if (data_index) {
-        return (static_cast<S &>(this->storage_group)).get(data_index);
-      } else {
-        return {};
+      if (data_index.has_value()) {
+        return (static_cast<S &>(this->storage_group)).get(data_index.value());
       }
-    } else {
-      return {};
     }
+    return {};
   }
 
   template <std::size_t Index>
   TypeAt<Index> &get_component_unchecked(Entity i) {
     using S = Storage<Index, TypeAt<Index>>;
     auto data_index = this->data_index_map[i];
-    return (static_cast<S &>(this->storage_group)).get(data_index);
+    return (static_cast<S &>(this->storage_group)).get(data_index.value());
   }
 
-  std::size_t size() {
-    return this->storage_size;
+  template <std::size_t Index>
+  bool update_component(Entity i, TypeAt<Index> elem) {
+    using S = Storage<Index, TypeAt<Index>>;
+    if (i < this->data_index_map.size()) {
+      auto data_index = this->data_index_map[i];
+      if (data_index.has_value()) {
+        (static_cast<S &>(this->storage_group)).set(data_index.value(), elem);
+        return true;
+      }
+    }
+    return false;
   }
+
+  void print_data_index_map() {
+    printf("DataIndexMap: [");
+    for (int i = 0; i < this->data_index_map.size(); i++) {
+      if (this->data_index_map[i].has_value()) {
+        printf("%lu, ", this->data_index_map[i].value());
+      } else {
+        printf("None, ");
+      }
+    }
+    printf("]\n");
+  }
+
+  std::size_t size() { return this->storage_size; }
 
   bool is_empty() { return this->size() == 0; }
 
-  // void print_data_index_map() {
-  //   printf("DataIndexMap: [");
-  //   for (int i = 0; i < this->data_index_map_size; i++) {
-  //     if (this->data_index_map[i].has_value()) {
-  //       printf("%lu, ", this->data_index_map[i].value());
-  //     } else {
-  //       printf("None, ");
-  //     }
-  //   }
-  //   printf("]\n");
-  // }
-
 private:
   std::size_t storage_size;
-  std::size_t data_index_map_size;
 
-  // From global index to local index. The local index is optional since the data
-  // might not be contained in this storage. This map should have the same size
-  // as the maximal `Entity` appeared in this storage group.
+  // From global index to local index. The local index is optional since the
+  // data might not be contained in this storage. This map should have the same
+  // size as the maximal `Entity` appeared in this storage group.
   std::vector<std::optional<Entity>> data_index_map;
 
-  // From local index to global index. Has the size the same as `storage_size` and
-  // `storage_group`.
+  // From local index to global index. Has the size the same as `storage_size`
+  // and `storage_group`.
   std::vector<Entity> global_index_map;
 
   // The dense storage group.
