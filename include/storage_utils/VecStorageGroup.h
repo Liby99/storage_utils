@@ -74,6 +74,10 @@ public:
     }
   }
 
+  BulkRef get_unchecked(Entity i) {
+    return this->storage_group.get_bulk(i);
+  }
+
   /**
    * Insert all the data (as function arguments) to the storage group.
    * Will return the index where the item get insert to.
@@ -193,6 +197,12 @@ public:
     }
   }
 
+  template <std::size_t Index>
+  TypeAt<Index> &get_component_unchecked(Entity i) {
+    using S = Storage<Index, TypeAt<Index>>;
+    return (static_cast<S &>(this->storage_group)).get(i);
+  }
+
   /**
    * Update the component at index `i` with the given data.
    * If the index is valid, return `true`. Otherwise return `false`.
@@ -207,8 +217,8 @@ public:
    */
   template <std::size_t Index>
   bool update_component(Entity i, TypeAt<Index> elem) {
+    using S = Storage<Index, TypeAt<Index>>;
     if (this->is_valid(i)) {
-      using S = Storage<Index, TypeAt<Index>>;
       (static_cast<S &>(this->storage_group)).set(i, elem);
       return true;
     }

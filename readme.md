@@ -123,5 +123,12 @@ This will run each of the executables inside the `tests` folder.
 Since this project is a header only library, you can simply use the following code in your `CMakeLists.txt` file:
 
 ``` cmake
-add_subdirectory(PATH_TO_YOUR_STORAGE_UTILS_DIR)
+add_subdirectory(${PATH_TO_YOUR_STORAGE_UTILS_DIR})
+target_include_directories(${YOUR_TARGET} PUBLIC ${PATH_TO_YOUR_STORAGE_UTILS_DIR}/include/)
+```
+
+And then you can use, in your `C++` code,
+
+```
+#include <storage_utils/Prelude.h>
 ```

@@ -20,6 +20,8 @@ public:
 
   void push(T elem) { this->data.push_back(elem); }
 
+  void swap(Entity i, Entity j) { swap(this->data[i], this->data[j]); }
+
 private:
   std::vector<T> data;
 };
@@ -34,6 +36,8 @@ public:
 
   template <typename... AllTypes>
   void push_bulk(const std::tuple<AllTypes...> &args) {}
+
+  void swap(Entity i, Entity j) {}
 };
 
 template <std::size_t Index, typename T, typename... Types>
@@ -62,6 +66,11 @@ public:
   void push_bulk(const std::tuple<AllTypes...> &args) {
     Storage<Index, T>::push(std::get<Index>(args));
     StorageGroupBase<Index + 1, Types...>::push_bulk(args);
+  }
+
+  void swap(Entity i, Entity j) {
+    Storage<Index, T>::swap(i, j);
+    StorageGroupBase<Index + 1, Types...>::swap(i, j);
   }
 };
 
